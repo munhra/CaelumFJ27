@@ -42,10 +42,10 @@ public class ProdutosController {
 		return "produtos/form";
 	}
 	
-	@RequestMapping(value="salvar",method=RequestMethod.GET)
+	@RequestMapping(value="salvar",method=RequestMethod.POST)
 	public String salvar(Produto produto){
 		produtoDao.salvar(produto);
-		return "redirect:/produto/listar";
+		return "redirect:/produtos/listar";
 		
 	}
 }
