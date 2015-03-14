@@ -1,6 +1,6 @@
 14/03/2015
 
-Curso Spring
+Curso Spring senha spring5071 wifi 32249998
 
 Desenvolvimento de uma aplicação que vai ser gravada no banco
 
@@ -78,6 +78,10 @@ public class testaProduto{
 	}
 }
 
+jsf indicado para sites com muito formulario, crud etc...
+
+Freemark thales, sitemesh
+
 Usamos o Spring para controlar a injeção de dependencia e a inversão de controle. Para fazermos a injeção
 precisamos configurar o spring previamente, usando um xml. Beans são todas as classes que o spring cuida, se você
 quer que o spring cuide de uma classe sua ela deve ser um bean. Abaixo a classe ProdutoDao está sendo gerenciada
@@ -126,6 +130,15 @@ Acessar a aplicação em http://localhost:8080/estoque/oi em spring, vamos fazer
 no xml, mas vamos usar uma anotação chamada @Controller
 
 Spring é um actionbased framework
+
+Bug F5
+
+metodos do form são get and post o post esconde os parametros
+
+Formato de url unfriendly
+produto/detalhe?id=1
+Format friendly
+produto/1
 
 @Controller
 public class OiController(){
@@ -187,9 +200,30 @@ public class ProdutoController{
 			
 		return mv;		
 	}
+	//@RequestMapping("/detalhe/{id}") // agora aceita o friendly
+	@RequestMapping("/detalhe") //parametro id com o mesmo nome faz o binding da url
+	//public ModelAndView detalhes(@PathVariable Long id){ //agora muda para fazer o binding da notação friendly	
+	public ModelAndView detalhes(Long id){
+		Produto produto = dao.buscaPorId(id);
+		ModelAndView mv = new ModelAndView("/detalhes");
+		mv.addAttribute(produto)
+		return mv
+	}
+
+	@RequestMapping(value="/salvar",method=Reques..Post) // vai salvar usando uma convenção de nomes só quando for post	
+	public void string salvar(Produto produto){
+		dao.salvar(produto);
+		//return "/lista"; // tem que fazer o spring redirencionar para carregar a lista
+		return "redirect:/produto/lista" 	
+	}
 }
 
-
+detalhes.jsp
+<html>
+	Nome: ${produto.nome} <br/>
+	Descricao: ${produto.descricao} <br/>
+	Quantidade: ${produto.quantidade} <br/>
+</html>
 
 lista-produtos.jsp (usa expression language para pegar os dados)
 
@@ -198,12 +232,23 @@ lista-produtos.jsp (usa expression language para pegar os dados)
 	<c:forEach items="produtos" var="produto"> // produtos vem lá do ModelAndView
 	<tr>
 		<td>
+			<a href="produto/detalhe?id=${produto.id}>
+				Detalhes
+			</a>
 		</td>
 	</tr>
 
 </table>
 
 
+cadastro.jsp
+
+<form action="produto/salvar" method="POST"> // caminho do submit
+	Nome <input type="text" name="nome"/>
+	Descrição <input type="text" name="descricao"/>
+	Quantidade <input type="text" name="quantidade"/>
+	<input type="submit" value="Cadastrar"/>
+</form>
 
 
 

@@ -5,7 +5,8 @@
 	</head>
 	<body>
 		<c:forEach items="${produtoList}" var="produto">
-			${produto.descricao} - ${produto.quantidade} <br/>
+			${produto.descricao} - ${produto.quantidade} - 
+			<a href="/estoque/produtos/mostrar/${produto.id}">detalhes</a><br/>
 		</c:forEach>
 	</body>
 </html>

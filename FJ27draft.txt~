@@ -1,6 +1,6 @@
 14/03/2015
 
-Curso Spring
+Curso Spring senha spring5071 wifi 32249998
 
 Desenvolvimento de uma aplicação que vai ser gravada no banco
 
@@ -78,6 +78,8 @@ public class testaProduto{
 	}
 }
 
+Freemark thales, sitemesh
+
 Usamos o Spring para controlar a injeção de dependencia e a inversão de controle. Para fazermos a injeção
 precisamos configurar o spring previamente, usando um xml. Beans são todas as classes que o spring cuida, se você
 quer que o spring cuide de uma classe sua ela deve ser um bean. Abaixo a classe ProdutoDao está sendo gerenciada
@@ -115,6 +117,138 @@ spring 4 foi lançado no meio de 2014
 - Notificar CD
 - Disparar email
 - Controlar a transação
+
+Fazer uma aplicação web usando o spring usamos o spring MVC, quando usamos servlets a parte ruim misturar codigo java com html
+evitar de ficar usando request.getParameter(), para evitar misturar codigo java com html
+
+Sai do browser, vai para o servidor e encontra um servlet e depois faz uma chamada para o Dao depois para uma pagina JSP. Esse
+fluxo já é um MVC. Modelo é o produto, Controller é o servlet e a view é o JSP.
+
+Acessar a aplicação em http://localhost:8080/estoque/oi em spring, vamos fazer o spring chamar a classe OiController teria que escrever
+no xml, mas vamos usar uma anotação chamada @Controller
+
+Spring é um actionbased framework
+
+Bug F5
+
+metodos do form são get and post o post esconde os parametros
+
+Formato de url unfriendly
+produto/detalhe?id=1
+Format friendly
+produto/1
+
+@Controller
+public class OiController(){
+
+	@RequestMapping("oi")// coloca a url que vai mapear	
+	public String void oi(){
+		//return "/WEB-INF/jsps/oi.jsp";
+		return "oi.jsp" // feito a configuração o prefixo já esta definido podemos mecher na extenção	
+	}
+}
+
+//view
+//para o jsp não ficar visivel  para o usuario guarda na pasta web-inf, e o usuario vai ter que acessar pelo controller
+oi.jsp
+<h1>Ola Spring<h1>
+
+spring.xml // para ser anotation
+
+<beans>
+	<mvc:annotation-based /> // muda o spring para pegar as anotações
+	<context:component-scan base-package="br.com.caelum.estoque"/>
+	
+	<bean class="org.spring.framework.InternalResourceViewResolver">
+		<propertyName="prefix" value="/WEB-INF/JSPS/">	
+		<propertyName="sufix"  value=".jsp">
+	</bean>
+	
+</beans>
+
+
+Vamos agora exibir a lista de produto no jsp
+
+@Component // aqui o spring vai gerenciar o objeto, como se tivesse marcado no xml
+public class ProdutoDao{
+
+}
+
+@Controller
+@RequestMapping("/produto")
+public class ProdutoController{
+
+	private ProdutoDao produtoDao;
+		   // pode anotar tanto o atributo quanto o construtor, foi preferido colocar no construtor
+		   // para mostrar a dependencia clara, o autowired diz ao spring que ele deve injetar uma instancia
+		   // do objeto ProdutoDao
+	@Autowired	
+	public ProdutoController(ProdutoDao produtoDao){
+		this.produtoDao = produtoDao; 
+	}
+
+	@RequestMapping("/listar")	
+	public ModelAndView lista(){
+		
+		List<Produto> lista = produtoDao.listar();	
+		// agora precisa passar a lista para a view
+		ModelAndView mv = new ModelAndView("Lista-Produtos"); // ModelAndView faz a ponte entre o modelo e a view
+		mv.addAttribute("produtos",lista);
+		// o literal produtos do parametro acima vai ser usado na view para pegar a lista
+			
+		return mv;		
+	}
+	//@RequestMapping("/detalhe/{id}") // agora aceita o friendly
+	@RequestMapping("/detalhe") //parametro id com o mesmo nome faz o binding da url
+	//public ModelAndView detalhes(@PathVariable Long id){ //agora muda para fazer o binding da notação friendly	
+	public ModelAndView detalhes(Long id){
+		Produto produto = dao.buscaPorId(id);
+		ModelAndView mv = new ModelAndView("/detalhes");
+		mv.addAttribute(produto)
+		return mv
+	}
+
+	@RequestMapping(value="/salvar",method=Reques..Post) // vai salvar usando uma convenção de nomes só quando for post	
+	public void string salvar(Produto produto){
+		dao.salvar(produto);
+		//return "/lista"; // tem que fazer o spring redirencionar para carregar a lista
+		return "redirect:/produto/lista" 	
+	}
+}
+
+detalhes.jsp
+<html>
+	Nome: ${produto.nome} <br/>
+	Descricao: ${produto.descricao} <br/>
+	Quantidade: ${produto.quantidade} <br/>
+</html>
+
+lista-produtos.jsp (usa expression language para pegar os dados)
+
+<table>
+	
+	<c:forEach items="produtos" var="produto"> // produtos vem lá do ModelAndView
+	<tr>
+		<td>
+			<a href="produto/detalhe?id=${produto.id}>
+				Detalhes
+			</a>
+		</td>
+	</tr>
+
+</table>
+
+
+cadastro.jsp
+
+<form action="produto/salvar" method="POST"> // caminho do submit
+	Nome <input type="text" name="nome"/>
+	Descrição <input type="text" name="descricao"/>
+	Quantidade <input type="text" name="quantidade"/>
+	<input type="submit" value="Cadastrar"/>
+</form>
+
+
 
 
 
