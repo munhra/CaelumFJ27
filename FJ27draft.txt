@@ -125,6 +125,8 @@ fluxo já é um MVC. Modelo é o produto, Controller é o servlet e a view é o 
 Acessar a aplicação em http://localhost:8080/estoque/oi em spring, vamos fazer o spring chamar a classe OiController teria que escrever
 no xml, mas vamos usar uma anotação chamada @Controller
 
+Spring é um actionbased framework
+
 @Controller
 public class OiController(){
 
@@ -153,6 +155,53 @@ spring.xml // para ser anotation
 	
 </beans>
 
+
+Vamos agora exibir a lista de produto no jsp
+
+@Component // aqui o spring vai gerenciar o objeto, como se tivesse marcado no xml
+public class ProdutoDao{
+
+}
+
+@Controller
+@RequestMapping("/produto")
+public class ProdutoController{
+
+	private ProdutoDao produtoDao;
+		   // pode anotar tanto o atributo quanto o construtor, foi preferido colocar no construtor
+		   // para mostrar a dependencia clara, o autowired diz ao spring que ele deve injetar uma instancia
+		   // do objeto ProdutoDao
+	@Autowired	
+	public ProdutoController(ProdutoDao produtoDao){
+		this.produtoDao = produtoDao; 
+	}
+
+	@RequestMapping("/listar")	
+	public ModelAndView lista(){
+		
+		List<Produto> lista = produtoDao.listar();	
+		// agora precisa passar a lista para a view
+		ModelAndView mv = new ModelAndView("Lista-Produtos"); // ModelAndView faz a ponte entre o modelo e a view
+		mv.addAttribute("produtos",lista);
+		// o literal produtos do parametro acima vai ser usado na view para pegar a lista
+			
+		return mv;		
+	}
+}
+
+
+
+lista-produtos.jsp (usa expression language para pegar os dados)
+
+<table>
+	
+	<c:forEach items="produtos" var="produto"> // produtos vem lá do ModelAndView
+	<tr>
+		<td>
+		</td>
+	</tr>
+
+</table>
 
 
 
