@@ -251,6 +251,135 @@ cadastro.jsp
 </form>
 
 
+21/03/2015
+Hibernate e técnologias de persistencia
+
+class Produto{
+
+	String nome;
+	String descricao;
+	Integer quantidade;
+}
+
+List<Produto> listaProdutos(){
+
+	conn = ....
+	sql = "Select * from produtos";
+	PreparedStmt = conn.prepareStatement(sql);
+	Produtos produtos...
+	while(rs.next()){
+		Produto produto = new Produto();	
+		String nome = rs.getString("nome");
+		produto.setNome(nome);
+		
+
+		produtos.addObject(produto)
+	}
+
+	return produtos;
+}
+
+JDBC foi feito para conversar com banco de dados, o código acima foi feito para mapear o banco
+relacional para um objeto (ORM).
+
+Usando o ORM
+
+pode user @Table, mas só se o nome da tabela for diferente do nome da classe
+@Entity
+class produto{
+	
+	@Id @GeneratedValue(strategy=identity)
+	Long id;
+	 
+	String nome;
+	String descricao;
+	Integer quantidade;
+
+...
+
+}
+// usando hibernate
+// com spring
+//@Component
+@Repository // ligado com banco de dados
+class ProdutoDBDAO implements ProdutoDAO{
+
+	@Autowired	
+	Session session // esse é do hibernate	
+
+	public List<Produto> listaProdutos(){
+
+		//Hql, hibernatne query language, JPQL, jpa query lanaguage
+		Query query = session.createQuery("Select p from Produto p"); 
+		return query.list();
+
+			
+	}
+	public void adiciona(Produto produto){
+		session.save(produto);
+	}	
+
+	//session.save
+	//session.update
+	//session.delete
+
+//Precisa configurar o banco
+spring.xml
+
+<beans>
+	// vai criar a conexão e quando terminar ele mata
+	<bean class="AnnotationSessionFactoryBean" id="sessionFactory" destroy-method="Destroy">
+		// configurações do hibernate		
+		<property name="hibernateProperties">
+			<props>
+				<prop key="url">JDBC:MYSQL://localhost/FJ27</prop>
+				<prop key="username">root</prop>
+				<prop key="password"></prop>
+				<prop key="driver_class>com.jdbc.mysql.Driver</prop>
+				<prop key="autocommit">true</prop>
+				<prop key="hibernate.hbm2ddl.auto></prop> // "Database Data language" 
+				<prop key="dialect">MySQL5InnoDBDialect</prop>
+				<prop key="showsql">true</prop>
+				<prop key="formatsql">true</prop>
+			</props>
+		</property>
+
+		<property="AnnotedClasses>
+			<list>
+				<value> br.com.*.produto</value>			
+			</list>
+		</property>
+
+
+			
+				 
+</beans>
+
+
+produtoController{
+	// nome da classe no qualificador
+	@AutoWired @Qualifier("produtoDBDao") // problema com a duplicidade das implementações usa um qualificador para isso
+	Produto dao;
+
+}
+
+@Qualifier, distingue dois tipos de implementação para uma interface
+
+Opções do hbm2ddl
+CREATE-DROP -> cria tudo e apaga tudo[ não usar em produção]
+UPDATE -> atualiza a mudança dos objetos para o banco um atributo novo cria uma coluna [não usar em produção]
+NONE -> 
+
+JAVA tem migration estilo ruby
+liquidbase [multibanco] esse é bom para produção
+
+
+Se não colocar nada o hibernate cria uma tabela para controlar os id's quando só coloca o @Id, 
+o hibernate também segue o conceito de convenção sobre configuração. No caso do atributo se a coluna
+tiver o mesmo nome do atributo ele mapeia direto. Alguns exemplos são Hibernate, Eclipse Link, IBatis
+e todos seguem a JPA. Escopo padrão do spring é singleton o destroy só cai quando acabar a session
+
+
 
 
 

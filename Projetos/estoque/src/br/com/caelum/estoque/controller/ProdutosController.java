@@ -1,6 +1,7 @@
 package br.com.caelum.estoque.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +17,7 @@ import br.com.caelum.estoque.dao.ProdutoDAO;
 public class ProdutosController {
 
 	@Autowired
+	@Qualifier("produtoHibernateDAO")
 	private ProdutoDAO produtoDao;
 	
 	@RequestMapping("/index")
