@@ -9,4 +9,5 @@ public interface ProdutoDAO {
 	void alterar(Produto produto);
 	List<Produto> listar();
 	Produto buscarPorId(Long id);
+	Integer estoqueAtual(Produto produto);
 }

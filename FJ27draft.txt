@@ -301,7 +301,9 @@ class produto{
 // usando hibernate
 // com spring
 //@Component
+@Primary // essa anotação mostra qual é o Primario e a injeção consegue saber que é essa implementação que deve ser usada.
 @Repository // ligado com banco de dados
+@Transactional // marca todos os métodos
 class ProdutoDBDAO implements ProdutoDAO{
 
 	@Autowired	
@@ -315,6 +317,7 @@ class ProdutoDBDAO implements ProdutoDAO{
 
 			
 	}
+	@Transactional // abre a transação e faz o commit no final
 	public void adiciona(Produto produto){
 		session.save(produto);
 	}	
@@ -350,7 +353,12 @@ spring.xml
 			</list>
 		</property>
 
-
+	</bean>
+	<bean class="org.*.HibernateTransactionManager" id="TxManager">
+		<property name="sessionFactory" ref="sessionFactory">
+	</bean>
+	<MVC:annotation_driven />
+	<tx:annotation_driven />
 			
 				 
 </beans>
@@ -368,7 +376,7 @@ produtoController{
 Opções do hbm2ddl
 CREATE-DROP -> cria tudo e apaga tudo[ não usar em produção]
 UPDATE -> atualiza a mudança dos objetos para o banco um atributo novo cria uma coluna [não usar em produção]
-NONE -> 
+NONE -> Primary
 
 JAVA tem migration estilo ruby
 liquidbase [multibanco] esse é bom para produção
@@ -379,7 +387,104 @@ o hibernate também segue o conceito de convenção sobre configuração. No cas
 tiver o mesmo nome do atributo ele mapeia direto. Alguns exemplos são Hibernate, Eclipse Link, IBatis
 e todos seguem a JPA. Escopo padrão do spring é singleton o destroy só cai quando acabar a session
 
+Dá para não usar o qualifier informando a classe padrão que será usada pela implementação.
+
+Transações com Spring - Spring Transaction
+
+No exemplo anterior usamos a chave com autocommit, mas se tiver que ir fazendo várias transações e se
+der pau no meio de uma delas, o interessante é ter um rollback. Com o autocommit perdemos o controle
+das transações, no DAO ia ser legal podermos abrir e fechar a transação, se não cuidar bem das transações
+podemos ter problemas de consistencia etc.. O spring controla as transações pelo SpringTx, esse
+modulo é um dos mais usados no spring. A transação tem que estar ligada com a sessão.
 
 
+Vamos agora colocar a movimentação do produto, para fazer a anotação de associação faz sempre a referencia da classe
+para a dependencia
 
+@Entity
+public class Movimentacao{
+	
+	@Id @GeneratedValue
+	Long id
+	@Enumerated(String) //pega a string do enum ordinal pega o ordinal do enum	
+	TipoMovimentacao tipo
+	@Temporal(TimeStamp)	
+	Calendar data
+	@ManyToOne        //Produto_Id	
+	Produto produto;
+	Integer quantidade;
+
+}
+
+public Enum TipoMovimentacao{
+	
+	ENTRADA,SAIDA;
+
+}
+
+@Controller
+public class ProdutoController{
+
+	public String alterar(Produto p){
+
+		@Autowire
+		MovimentacaoService movService;
+		movService.gerar(p);		
+		produtoDAO.alterar(p);
+		
+	}
+
+}
+// essa classe service faz a lógica de negocio por isso tem o final Service
+// por isso usa o @Service
+//@Component
+@Service
+public class MovimentacaoService{
+
+	@Autowired
+	ProdutoDao pDao;
+	@Autowired
+	Movimentacao movDao;
+
+	public void gerar(Produto p){  // Regra de negocio
+		
+		Produto outro = produtoDAO.buscaPorId(p.getId());
+		
+		int movQTd = p.getQtd() - outro.getQtd();
+
+		Movimentacao movimentacao = new Movimentacao();
+		movimentacao.setQtd(movQtd);
+		movimentacao.setProduto(p);
+		movimentacao.setData(Calendar.getInstance());
+		
+		if (outro.getQuantidade() > p.getQuantidade()){
+			movimentacao.setTipo(TipoMovimentacao.ENTRADA);
+		}else if (){
+			movimentacao.setTipo(TipoMovimentacao.SAIDA);
+		}	
+		
+		
+		movimentacao.setQuantidade(p.getQuantidade());
+
+
+		movDao.adiciona(movimentacao);	
+	}
+
+}
+
+@Entity
+class Produto{
+	
+	:
+	:
+	@OneToMany(mappedBy="Produto")// nome do atributo na movimentacao
+	List<Movimentacao> movimentacoes;
+
+}
+
+
+Pensamento interessante o DAO não ter lógica de negócio e a lógica de negócio ficar na SERVICE
+
+
+Mostrar as movimentacoes na tela, vai trazer a lista de movimentações
 
