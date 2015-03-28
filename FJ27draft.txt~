@@ -729,8 +729,32 @@ por fora do SHA evitando assim os bancos de hash code.
 
 Mostrar o nome do usuário, usa uma tag
 
-Usuario:<authentication property="principal.username"/>
+Usuario:<sec:authentication property="principal.username"/>
 
+Spring boot parace ser legal por ser mais leve da uma olhada depois.
+
+Como redirencionar o usuario para uma pagina conforme o role
+
+@Component
+public class LoginSuccessHandler implements AuthenticationSuccessHandler{
+
+
+	public void onAuthenticationSuccess(request,response, Authentication authentication){
+	
+		List<GrantedAuthority> Roles = authentication.getAuthorities();
+			
+		Grupo G = new Grupo();
+		if (){
+		
+			
+		}	
+
+	}
+}
+
+<security:http auto-config="true">
+	<security:form-log authentication-success-handler-ref="LoginSuccessHandler"/>
+</security:http>
 
 
 

@@ -57,12 +57,13 @@
 	</bean>
 	
 	<security:http auto-config="true">
-		<security:intercept-url pattern="/produtos/**" access="ROLE_USER" />
+		<security:intercept-url pattern="/produtos/**" access="ROLE_USER,CONF_USER" />
 		<security:form-login login-page="/login-form"
-							 always-use-default-target="true"
+							 always-use-default-target="false"
 							 default-target-url="/produtos/listar"
-							 login-processing-url="/login" />
-		
+							 login-processing-url="/login" 
+							 authentication-success-handler-ref="loginSuccessHandler"
+							 />
 		
 		<security:logout logout-url="/logout" logout-success-url="/login-form" />
 			

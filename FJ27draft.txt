@@ -731,6 +731,32 @@ Mostrar o nome do usuário, usa uma tag
 
 Usuario:<sec:authentication property="principal.username"/>
 
+Spring boot parace ser legal por ser mais leve da uma olhada depois.
+
+Como redirencionar o usuario para uma pagina conforme o role
+
+@Component
+public class LoginSuccessHandler implements AuthenticationSuccessHandler{
+
+
+	public void onAuthenticationSuccess(request,response, Authentication authentication){
+	
+		List<GrantedAuthority> Roles = authentication.getAuthorities();
+			
+		Grupo g = new Grupo();
+		g.setNome("ROLE_USER")
+		
+		if (roles.contains(g)){
+		
+			res.sendRedirect("produtos/novo")
+		}	
+
+	}
+}
+
+<security:http auto-config="true">
+	<security:form-log authentication-success-handler-ref="LoginSuccessHandler"/>
+</security:http>
 
 
 
