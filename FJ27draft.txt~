@@ -474,13 +474,47 @@ public class MovimentacaoService{
 
 @Entity
 class Produto{
-
 	
+	:
+	:
+	@OneToMany(mappedBy="Produto")// nome do atributo na movimentacao
+	List<Movimentacao> movimentacoes;
 
 }
 
 
-Pensamento interessante o DAO não ter lógica de negócio e a lógica de negócio ficar na SERVICE
+Mostra.JSP
+
+	<H2> Produto </H2>
+		 Nome:${produto.nome}
+
+	<ul>
+		<c:forEach items="${produto.movimentacoes}"
+
+
+.. continua no exericio 5.20
+
+Pensamento interessante o DAO não ter lógica de negócio e a lógica de negócio ficar na SERVICE,
+cuidado com o EAGER pode detonar a memória, tem quer usar um filter para manter a session, pela documentacao
+do hibernate dá para usar uma open session in view. Esse é um filter do spring
+
+
+web.xml
+
+<filter>
+	<filter-class>org.*.OpenSessionInViewFilter/>
+</filter>
+<filter-mapping>
+	<filter-name>opensession</filter-name>	
+	<servlet-name>SpringServlet</servlet-name>
+</filter-mapping>
+<listener>
+	ContextLoaderListener
+</listener>
+<context-param>
+	
+</context-param>
+
 
 
 Mostrar as movimentacoes na tela, vai trazer a lista de movimentações

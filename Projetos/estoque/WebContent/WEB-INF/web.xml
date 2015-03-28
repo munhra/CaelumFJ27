@@ -10,7 +10,7 @@
 		<init-param>
 			<param-name>contextConfigLocation</param-name>
 			<param-value>
-				/WEB-INF/spring/app-config.xml
+				/WEB-INF/spring/empty.xml
 			</param-value>
 		</init-param>
 		<load-on-startup>1</load-on-startup>
@@ -22,4 +22,25 @@
 	<welcome-file-list>
 		<welcome-file>index.jsp</welcome-file>
 	</welcome-file-list>
+	<filter>
+			<filter-name>hibernateFilter</filter-name>	
+			<filter-class>
+				org.springframework.orm.hibernate3.support.OpenSessionInViewFilter
+			</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>hibernateFilter</filter-name>
+		<servlet-name>Spring MVC Dispatcher Servlet</servlet-name>
+	</filter-mapping>
+	<listener>
+		<listener-class>
+			org.springframework.web.context.ContextLoaderListener
+		</listener-class>
+	</listener>
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>/WEB-INF/spring/app-config.xml</param-value>
+	</context-param>
+	
+	
 </web-app>

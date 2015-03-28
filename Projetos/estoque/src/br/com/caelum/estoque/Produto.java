@@ -1,8 +1,11 @@
 package br.com.caelum.estoque;
 
+import java.util.List;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
 @Entity
 public class Produto {
@@ -12,6 +15,9 @@ public class Produto {
 	private Long id;
 	private String descricao;
 	private Integer quantidade;
+	
+	@OneToMany(mappedBy="produto")
+	private List<Movimentacao>movimentacoes;
 
 	public Long getId() {
 		return id;
@@ -37,4 +43,12 @@ public class Produto {
 		this.quantidade = quantidade;
 	}
 
+	public List<Movimentacao> getMovimentacoes() {
+		return movimentacoes;
+	}
+
+	public void setMovimentacoes(List<Movimentacao> movimentacoes) {
+		this.movimentacoes = movimentacoes;
+	}
+	
 }
