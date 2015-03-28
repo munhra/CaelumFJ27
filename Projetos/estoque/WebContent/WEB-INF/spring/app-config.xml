@@ -54,6 +54,13 @@
 	
 	<security:http auto-config="true">
 		<security:intercept-url pattern="/produtos/**" access="ROLE_USER" />
+		<security:form-login login-page="/login-form"
+							 always-use-default-target="true"
+							 default-target-url="/produtos/listar"
+							 login-processing-url="/login" />
+		
+		
+		<security:logout logout-url="/logout" logout-success-url="/login-form" />
 			
 	</security:http>
 	
