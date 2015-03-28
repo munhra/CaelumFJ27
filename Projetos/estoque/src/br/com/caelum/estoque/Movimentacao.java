@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.validation.constraints.NotNull;
 
 @Entity
 public class Movimentacao {
@@ -13,10 +14,13 @@ public class Movimentacao {
 	@Id
 	@GeneratedValue
 	private Long id;
+	@NotNull
 	private Calendar data;
 	private TipoMovimentacao tipo;
+	@NotNull
 	private Integer quantidade;
 	@ManyToOne
+	@NotNull
 	private Produto produto;
 	public Long getId() {
 		return id;

@@ -512,10 +512,208 @@ web.xml
 	ContextLoaderListener
 </listener>
 <context-param>
-	
+	<param-name>contextconfiglocation</param-name>
+	<param-value>/WEB-INF/app-config.xml</param-value>
 </context-param>
 
 
 
 Mostrar as movimentacoes na tela, vai trazer a lista de movimentações
+
+
+28/03/2015
+
+Começando a falar de validação, vendo se o produto p tem campos nulo
+
+public String salvar(Produto p){
+
+	//if (p.getDescricao.isEmpty()){
+	if (p.isValid){
+
+		return "produtos/Salvar";
+	}
+
+}
+
+Mas o legal é colocar um método para checar se o produto é 
+valido ou não dentro da classe Produto
+
+Boolean isValid(){
+
+	if (this.descricao.isEmpty()){
+		return false
+	}
+
+	if (this.quantidade == null){
+
+		return false
+	}
+
+	return true
+}
+
+O Hibernate tem um validator chamado Hibernate Validator, usa
+o modelo para marcar
+
+
+public class Produto{
+
+	Long id;
+	@NotEmpty	
+	String descricao;
+
+	List<Mov> movimentacoes;
+	@NotNull(message="not null") // mas o melhor é colocar num arquivo separado
+                                     // no message.properties
+	Integer quantidade;
+
+
+}
+
+Foi criado uma especificação chamada de beanvalidation, a bean 
+validation não tem tantas e o Hibernate Validatior implementou mais.
+
+O spring tem um objeto chamado BindingResult, processa e mostra todos os resultados da validação
+
+O objeto binding result já vem com o erro, spring já entende
+que tem o parametro result no método, pois está marcado com
+@RequestMapping. É importante fazer o tratamento de erro no 
+servidor, e opcionalmente no cliente, para uma experiencia mais
+suave.
+
+@RequestMapping("..")
+public String salvar(@Valid Produto produto, BindingResult result)	
+	
+	if(result.hasErrors()){
+		return "produtos/salvar"
+	} 
+
+}
+
+
+
+Pode ser que tenha uma operação intermediaria de salvar parcial, e 
+ai podemos ter dois método um que cadastra e outro que salva, em um
+pode fazer a validação e no outro não. Para mostrar o erro o spring MVC tem uma tag chamada errors
+<%@ taglib uri="http://..../tags/form> // procura a lib no projeto
+<form action="produtos/salvar" method="POST">
+	<errors path = "produto.descricao"/> // produto é o parametro do metodo salvar onde está o @Valid
+
+	Descricao:
+	<inputtype="text" name="descricao">
+
+</form>
+
+
+No arquivo ficaria na message.properties
+NotNull.produto.descricao = "Não pode ser Vazio"
+
+
+Temos que configurar o local onde o spring vai achar o message.properties, legal colocar no /web-inf/i18n
+
+app-config.xml
+<BEAN CLASS="">
+	<PROPERTY NAME="BASENAME" VALUE="">
+</BEAN>
+
+Autenticação e Autorização ou seja segurança, o spring tem um modulo chamado de spring security, antigamente
+chamado de ACEGI, dá prever ataque de multibrowser entre outras. Para isso vamos precisar de um usuário
+
+@Entity
+public class Usuario {
+
+	@Id @GeneratedValue
+	Long id;
+	String login;
+	String Senha;
+	@OneToMany	
+	List<Papel> papeis;
+
+
+}
+
+@Entity
+public class Papel {
+	@Id @GeneratedValue
+	Long id;
+	String nome;
+}
+
+
+A configuração da segurança começa com um filtro, definido no web.xml
+
+<filter>
+	<filter-name>Spring Security </filter-name>
+	<filter-class>DelegatingFilterProxy</filter-class>
+</filter>
+<filter-mapping>
+	<filter-name>SpringSecurity</filter-name>
+	<url-pattern>/*</url-pattern>
+</filter-mapping>
+
+
+Precisa usar a interface userDetails e a interface GrantedAuthority para fazer com que o spring encontre os métodos na interface
+
+public String getUsername()
+public String getPassword()
+List<GrantedAuthoriyt>getAuthorities
+
+Tem que amarrar o security com as entidades de seguranca grupo e usuario, o UsuarioDAO vai ser o nosso authentication-provider
+
+@Repository("usuarioDAO")
+public class UsuarioDao extends UserDetailService{
+
+	public UserDetail loadUserByUsername(String username){
+		String HQL = "Select u from Usuarios u where u.login=:";
+		Usuario u = Factory.getCurrentSession.CreateQuery(HQL).setParameter("login",username).getStringResult();	
+		return u;	
+	}	
+
+
+}
+
+
+app-config.xml
+
+<security:http auto-config="true">
+
+</security:http>
+
+<security:authentication-manager>
+	<security:authenticatoin-provider user-service-ref="usuarioDao"/>
+
+</security:authentication-manager>
+
+O spring vai mostrar uma tela de login padrão, mas para mudar isso criamos um 
+
+
+public class UsuarioController{
+
+	@RequestMapping("/login")
+	public String login(){
+
+		return "login"
+	}
+
+}
+
+login.jsp
+
+<form action = "j_spring_security_check" method="post">
+	Login <input type="text" name="j_username">
+	Senha <input type="password" name="j_password".
+	<input type="submit">
+</form>
+
+para alterar o padrão do spring temos que modificar o xml na parte do security,
+<security:form.login login-page="/login">
+<security:login-processing-url="/logar"> // nesse caso o spring vai receber o request
+<security:username-parameter="username">
+<security:password-parameter="senha">
+<security:default-target-url="/produtos/listar"> //onde o usuario será redirencionado após logar
+<security:always-use-default-target="true" /> // diz para o spring sempre usar essa pagina default ao logar
+
+
+
+
 
