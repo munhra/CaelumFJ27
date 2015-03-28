@@ -52,6 +52,10 @@
 		
 	</bean>
 	
+	<bean class="org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler" id="webexpressionHandler">
+	
+	</bean>
+	
 	<security:http auto-config="true">
 		<security:intercept-url pattern="/produtos/**" access="ROLE_USER" />
 		<security:form-login login-page="/login-form"
@@ -65,7 +69,9 @@
 	</security:http>
 	
 	<security:authentication-manager>
-		<security:authentication-provider user-service-ref="usuarioDAO"/>
+		<security:authentication-provider user-service-ref="usuarioDAO">
+			<security:password-encoder hash="sha-256"/>
+		</security:authentication-provider>
 	</security:authentication-manager>
 	
 	<tx:annotation-driven />

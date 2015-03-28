@@ -716,7 +716,20 @@ para alterar o padrão do spring temos que modificar o xml na parte do security,
 
 <security:logout logout-url="/logout" logout-success-url="/login"/>
 
+existe o @Secured(), que é utilizada para dar acesso a um determinado role. 
+devemos também manter a senha criptografada podemos usar o algoritmo MD5,
+o SHA-256 que é mais indicado, ai pode juntar com salt o salt é um modificador
+por fora do SHA evitando assim os bancos de hash code.
 
+<security:authentication-manager>
+	<security:authentication-provider user-service-ref="usuarioDAO">
+		<security:password-encode hash="sha-256"/>
+	</security:authentication-provider>
+</security:authentication-manager>
+
+Mostrar o nome do usuário, usa uma tag
+
+Usuario:<sec:authentication property="principal.username"/>
 
 
 
